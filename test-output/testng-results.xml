@@ -1,62 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results skipped="0" failed="0" ignored="1" total="4" passed="3">
+<testng-results skipped="0" failed="0" ignored="2" total="4" passed="2">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="9077" started-at="2019-09-22T13:32:53Z" finished-at="2019-09-22T13:33:02Z">
+  <suite name="Default suite" duration-ms="4765" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:37Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="9077" started-at="2019-09-22T13:32:53Z" finished-at="2019-09-22T13:33:02Z">
+    <test name="Default test" duration-ms="4765" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:37Z">
       <class name="tests.Fynd_Employees_APIs">
-        <test-method status="PASS" signature="setUp()[pri:0, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="setUp" is-config="true" duration-ms="451" started-at="2019-09-22T13:32:53Z" finished-at="2019-09-22T13:32:53Z">
+        <test-method status="PASS" signature="setUp()[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="setUp" is-config="true" duration-ms="519" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:33Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method status="PASS" signature="get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="get_all_employees" duration-ms="2285" started-at="2019-09-22T13:32:53Z" finished-at="2019-09-22T13:32:56Z">
+        <test-method status="PASS" signature="get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@31610302]" name="get_all_employees" duration-ms="2312" started-at="2019-09-22T15:06:33Z" finished-at="2019-09-22T15:06:35Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- get_all_employees -->
-        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="getResult" is-config="true" duration-ms="526" started-at="2019-09-22T13:32:56Z" finished-at="2019-09-22T13:32:56Z">
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="getResult" is-config="true" duration-ms="389" started-at="2019-09-22T15:06:35Z" finished-at="2019-09-22T15:06:35Z">
           <params>
             <param index="0">
               <value>
-                <![CDATA[[TestResult name=get_all_employees status=SUCCESS method=Fynd_Employees_APIs.get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@7e0b0338] output={null}]]]>
+                <![CDATA[[TestResult name=get_all_employees status=SUCCESS method=Fynd_Employees_APIs.get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@31610302] output={null}]]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- getResult -->
-        <test-method status="PASS" signature="create_employee()[pri:2, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="create_employee" duration-ms="5659" started-at="2019-09-22T13:32:56Z" finished-at="2019-09-22T13:33:02Z">
-          <reporter-output>
-          </reporter-output>
-        </test-method> <!-- create_employee -->
-        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="getResult" is-config="true" duration-ms="73" started-at="2019-09-22T13:33:02Z" finished-at="2019-09-22T13:33:02Z">
-          <params>
-            <param index="0">
-              <value>
-                <![CDATA[[TestResult name=create_employee status=SUCCESS method=Fynd_Employees_APIs.create_employee()[pri:2, instance:tests.Fynd_Employees_APIs@7e0b0338] output={null}]]]>
-              </value>
-            </param>
-          </params>
-          <reporter-output>
-          </reporter-output>
-        </test-method> <!-- getResult -->
-        <test-method status="PASS" signature="update_employee()[pri:2, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="update_employee" duration-ms="2" started-at="2019-09-22T13:33:02Z" finished-at="2019-09-22T13:33:02Z">
+        <test-method status="PASS" signature="update_employee()[pri:4, instance:tests.Fynd_Employees_APIs@31610302]" name="update_employee" duration-ms="1461" started-at="2019-09-22T15:06:35Z" finished-at="2019-09-22T15:06:37Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- update_employee -->
-        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="getResult" is-config="true" duration-ms="55" started-at="2019-09-22T13:33:02Z" finished-at="2019-09-22T13:33:02Z">
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="getResult" is-config="true" duration-ms="67" started-at="2019-09-22T15:06:37Z" finished-at="2019-09-22T15:06:37Z">
           <params>
             <param index="0">
               <value>
-                <![CDATA[[TestResult name=update_employee status=SUCCESS method=Fynd_Employees_APIs.update_employee()[pri:2, instance:tests.Fynd_Employees_APIs@7e0b0338] output={null}]]]>
+                <![CDATA[[TestResult name=update_employee status=SUCCESS method=Fynd_Employees_APIs.update_employee()[pri:4, instance:tests.Fynd_Employees_APIs@31610302] output={null}]]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- getResult -->
-        <test-method status="PASS" signature="tearDown()[pri:0, instance:tests.Fynd_Employees_APIs@7e0b0338]" name="tearDown" is-config="true" duration-ms="1" started-at="2019-09-22T13:33:02Z" finished-at="2019-09-22T13:33:02Z">
+        <test-method status="PASS" signature="tearDown()[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="tearDown" is-config="true" duration-ms="0" started-at="2019-09-22T15:06:37Z" finished-at="2019-09-22T15:06:37Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->

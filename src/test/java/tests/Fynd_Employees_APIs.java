@@ -2,6 +2,7 @@ package tests;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ import utilities.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import scala.util.Random;
 
 import static io.restassured.RestAssured.given;
 
@@ -58,6 +60,7 @@ public class Fynd_Employees_APIs {
 	String emp_id = "";
 	String emp_name;
 	JsonArray five_employees_data = new JsonArray();
+	JsonArray all_employees_data;
 	
 	@BeforeTest
 	public void setUp() throws ClassNotFoundException, IOException {
@@ -115,19 +118,19 @@ public class Fynd_Employees_APIs {
 						when().
 						get("/api/v1/employees").
 						then().assertThat().statusCode(200).extract().response();
-		JsonArray json = (JsonArray) new JsonParser().parse(res.asString());
+		all_employees_data = (JsonArray) new JsonParser().parse(res.asString());
 
 		System.out.println(res.asString());
-		System.out.println(json.size());
-		if(json.size()==0) {
+		System.out.println(all_employees_data.size());
+		if(all_employees_data.size()==0) {
 			childTest.log(Status.INFO, "No employee data");
 		}else {
-			childTest.log(Status.INFO, json.size()+" no of employees data found");
+			childTest.log(Status.INFO, all_employees_data.size()+" no of employees data found");
 		}
 		
 		
-		for(int emp=0;emp<json.size();emp++) {
-			JsonObject emp_object = json.get(emp).getAsJsonObject();
+		for(int emp=0;emp<all_employees_data.size();emp++) {
+			JsonObject emp_object = all_employees_data.get(emp).getAsJsonObject();
 			five_employees_data.add(emp_object);
 			if(emp==5) {
 				break;
@@ -146,7 +149,7 @@ public class Fynd_Employees_APIs {
 
 	
 	@SuppressWarnings("unchecked")
-	@Test(priority=2)
+	@Test(priority=2, enabled = false)
 	public void create_employee() throws IOException {
 		String excelPathOfCreateEmp = System.getProperty("user.dir")+"/input_data/payload/create_employee/create_emp.xlsx";
 		ExtentTest logger=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/create");
@@ -286,13 +289,53 @@ public class Fynd_Employees_APIs {
 	
 	
 	
-	@Test(priority=2)
-	public void update_employee() {
-	
+	@Test(priority=4)
+	public void update_employee() throws IOException {
+		given = given();
+		Random rand = new Random();
+		int rand_no = rand.nextInt(all_employees_data.size());
+		JsonObject random_employee = all_employees_data.get(rand_no).getAsJsonObject();
+		String random_employee_name = random_employee.get("employee_name").toString();
+		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
 		
-	
-	
+		System.out.println(random_employee.toString());
+		String updateAPI = prop.getProperty("BASE_URL")+"/api/v1/update/";
+		logger = extent.createTest(updateAPI);
+		childTest = logger.createNode(updateAPI+random_employee);
+		childTest.log(Status.INFO, "Taken below employee to check update API<br>"+random_employee.toString());
+		String file_path = "./input_data/payload/update_employee";
+		
+		FileWriter f_valid = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_valid_data.json");
+		FileWriter f_empty = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_empty_data.json");
+		FileWriter f_unknown_char = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_unknown_chars.json");
+		FileWriter f_irsp_dataType = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_irrespective_datatypes.json");
+		
+		
+		
+		List<File> files = new ArrayList<File>();
+		files.add(new File(file_path+"/update_employee_valid_data.json"));
+		files.add(new File(file_path+"/update_employee_empty_data.json"));
+		files.add(new File(file_path+"/update_employee_unknown_chars.json"));
+		files.add(new File(file_path+"/update_employee_irrespective_datatypes.json"));
+		
+		
+		Response res = given.
+							body(new File("./input_data/payload/update_employee/update_employee_valid_data.json")).
+							when().
+							put("/api/v1/update/"+id).
+							then().assertThat().statusCode(200).extract().response();
+		
+		System.out.println(res.asString());
+		
 	}
+	
+	public void update_employee_details(String name, String exp_beh) {
+		
+		
+		
+	}
+	
+	
 	public void delete_employee() {
 	
 	
@@ -300,4 +343,5 @@ public class Fynd_Employees_APIs {
 	}
 	
 }
+
 

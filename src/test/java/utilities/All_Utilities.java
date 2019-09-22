@@ -2,7 +2,10 @@ package utilities;
 
 import static io.restassured.RestAssured.given;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,6 +35,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.json.simple.JSONObject;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -179,6 +183,35 @@ public class All_Utilities {
       return payload; 
     } 
     
+    
+    @SuppressWarnings("unchecked")
+	public FileWriter create_payload_for_update(String name, long salary, int age, int id, String file_name) throws IOException {
+    	
+    	JSONObject json = new JSONObject();
+    	json.put("name", name);
+    	json.put("salary", salary);
+    	json.put("age", age);
+    	json.put("id", id);
+    	
+    	FileWriter f = write_json_object_to_file(json, file_name);
+    	return f;
+    }
+    
+    public FileWriter write_json_object_to_file(JSONObject object, String file_name) throws IOException {
+    	File f = new File(file_name);
+    	f.createNewFile();
+    	FileWriter file = new FileWriter(f);
+        try {
+        	file.write(object.toJSONString());
+    		System.out.println("data : " +object);
+    	}catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}finally {
+    		file.flush();
+    		file.close();
+		}
+        return file;
+    }
     
     
 }
