@@ -8,7 +8,7 @@
           <include name="tearDown"/>
           <include name="setUp"/>
           <include name="getResult"/>
-          <include name="get_employee"/>
+          <include name="update_employee"/>
         </methods>
       </class> <!-- tests.Fynd_Employees_APIs -->
     </classes>

@@ -57,6 +57,7 @@ public class Fynd_Employees_APIs {
 	Properties prop;
 	String emp_id = "";
 	String emp_name;
+	JsonArray five_employees_data = new JsonArray();
 	
 	@BeforeTest
 	public void setUp() throws ClassNotFoundException, IOException {
@@ -77,7 +78,7 @@ public class Fynd_Employees_APIs {
 		
 		RestAssured.baseURI = prop.getProperty("BASE_URL");
 		
-//		reporter.config().setReportName("task_automation_jagadeesh : "+this.getClass().getSimpleName());
+		reporter.config().setReportName("task@fynd : "+this.getClass().getSimpleName());
 		
 	}
 	
@@ -105,10 +106,10 @@ public class Fynd_Employees_APIs {
 	}
 	
 	
-	@Test(priority=1, enabled = false)
+	@Test(priority=1)
 	public void get_all_employees() {
 		
-		ExtentTest logger=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/employees");
+		childTest=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/employees");
 		given = given();
 		Response res= given.
 						when().
@@ -116,12 +117,30 @@ public class Fynd_Employees_APIs {
 						then().assertThat().statusCode(200).extract().response();
 		JsonArray json = (JsonArray) new JsonParser().parse(res.asString());
 
-		logger.log(Status.PASS, "hello");
-
-	
 		System.out.println(res.asString());
+		System.out.println(json.size());
+		if(json.size()==0) {
+			childTest.log(Status.INFO, "No employee data");
+		}else {
+			childTest.log(Status.INFO, json.size()+" no of employees data found");
+		}
 		
-		System.out.println(util.create_new_employee());
+		
+		for(int emp=0;emp<json.size();emp++) {
+			JsonObject emp_object = json.get(emp).getAsJsonObject();
+			five_employees_data.add(emp_object);
+			if(emp==5) {
+				break;
+			}
+		}
+		
+		String message = "For your reference, showing "+five_employees_data.size()+" employees data below<br>";
+		for(int e=0;e<five_employees_data.size();e++) {
+			JsonObject e_object = five_employees_data.get(e).getAsJsonObject();
+			System.out.println(e_object.toString());
+			message = message+e_object.toString()+"<br>";
+		}
+		childTest.log(Status.PASS, message);
 
 	}
 
@@ -179,6 +198,9 @@ public class Fynd_Employees_APIs {
 			case "negative":
 //				
 				if(res.asString().contains("error")) {
+					if(res.asString().contains(test_case.get(0).toString())) {
+						childTest.log(Status.PASS, "employee details can't be duplicate");
+					}
 					childTest.log(Status.PASS, res.asString());
 				}else {
 					try {
@@ -205,9 +227,9 @@ public class Fynd_Employees_APIs {
 		
 	}
 	
-	@Test(priority=3)
+	@Test(priority=3, enabled = false)
 	public void get_employee() {
-		logger = extent.createTest(prop.getProperty("BASE_URL"));
+		logger = extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/employee/");
 		get_emp_details_test(emp_id, "with valid employee id", "positive");
 		get_emp_details_test(String.valueOf(123123), "with invalid employee id", "negative");
 		get_emp_details_test("&*(#*", "with unknow character employee id", "negative");
@@ -231,7 +253,7 @@ public class Fynd_Employees_APIs {
 		}
 		
 		given = given();
-	
+		
 		Response res = given.
 							when().
 							get(resource).
@@ -244,8 +266,9 @@ public class Fynd_Employees_APIs {
 		case "positive":
 			
 			JsonObject json_res = (JsonObject) new JsonParser().parse(res.asString());
-			int id = Integer.parseInt(json_res.get("id").toString().replaceAll("\"", ""));
+			String id = json_res.get("id").toString();
 			Assert.assertEquals(id, emp_id);
+			childTest.log(Status.PASS, res.asString());
 			
 			break;
 		case "negative":
