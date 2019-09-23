@@ -4,9 +4,14 @@ import static io.restassured.RestAssured.given;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,9 +29,14 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.common.hash.Hashing;
@@ -36,9 +46,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import scala.util.Random;
 
 public class All_Utilities {
 
@@ -85,13 +98,14 @@ public class All_Utilities {
         
         ArrayList<String>  columnNamesOfParams = new ArrayList<String>();
     	ArrayList<Object> values;
-        
+    	Sheet sheet = workbook.getSheetAt(sheetNo);
+    	int rows = sheet.getLastRowNum();
+    	System.out.println("No of rows : "+rows);
        
-		while (rowIterator.hasNext()) {
+		for(int r = 0;r<=rows;r++) {
         	j++;
 //        	System.out.println("row: "+j);
-        	Row row = rowIterator.next();
-            // Now let's iterate over the columns of the current row
+        	Row row = sheet.getRow(r);
         	Iterator<Cell> cellIterator = row.cellIterator();
         	
         	
@@ -185,7 +199,7 @@ public class All_Utilities {
     
     
     @SuppressWarnings("unchecked")
-	public FileWriter create_payload_for_update(String name, long salary, int age, int id, String file_name) throws IOException {
+	public FileWriter create_payload_for_update(Object name, long salary, int age, int id, String file_name) throws IOException {
     	
     	JSONObject json = new JSONObject();
     	json.put("name", name);
@@ -203,7 +217,7 @@ public class All_Utilities {
     	FileWriter file = new FileWriter(f);
         try {
         	file.write(object.toJSONString());
-    		System.out.println("data : " +object);
+    		System.out.println("data written to JSON : " +object);
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
     	}finally {
@@ -211,6 +225,133 @@ public class All_Utilities {
     		file.close();
 		}
         return file;
+    }
+    
+    
+    public void writeToExcel(String sheetName,Object[][] data, String filePath) throws IOException, InvalidFormatException {
+          
+         FileInputStream inputStream = new FileInputStream(new File(filePath));
+         Workbook workbook = WorkbookFactory.create(inputStream);
+
+         Sheet sheet = workbook.getSheet(sheetName);
+
+         int rowCount = sheet.getLastRowNum();
+         System.out.println("row count : "+rowCount);
+          
+         for (Object[] object : data) {
+             
+             int columnCount = 0;
+        
+             String test_name = object[0].toString();
+             if(check_test_case_existOrNot(workbook, sheet, test_name)) {
+            	 continue;
+             }else {
+            	 Row row = sheet.createRow(++rowCount);
+            	 for (Object field : object) {
+            		 Cell cell = row.createCell(columnCount++);
+            		 if (field instanceof String) {
+            			 cell.setCellValue((String) field);
+            		 } else if (field instanceof Integer) {
+            			 cell.setCellValue((Integer) field);
+            		 }
+            	 }
+               
+             }
+              
+         }
+          
+          
+         try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+             workbook.write(outputStream);
+             outputStream.close();
+         }
+ 
+    }
+    
+    
+    public boolean check_test_case_existOrNot(Workbook workbook, Sheet sheet,String test_name) {
+    	
+    	int rows = sheet.getLastRowNum();
+    	System.out.println(rows);
+    	
+    	for(int r=0;r<=rows;r++) {
+    		Row row = sheet.getRow(r);
+       		String existing_test_name = row.getCell(0).toString();
+       		System.out.println(existing_test_name);
+    		if(existing_test_name.equals(test_name)) {
+    			System.out.println("true");
+    			return true;
+    		}
+		}
+    	System.out.println("false");
+		return false;
+    	
+    }
+    
+    public int randomNumber() {
+    	Random rnd = new Random();
+    	int number = 1000 + rnd.nextInt(900000);
+    	return number;
+    }
+    
+    public String getRandomName() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rand = new Random();
+        while (salt.length() < 7) {
+            int index = (int) (rand.nextFloat() * chars.length());
+            salt.append(chars.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
+    }
+    
+    public JSONObject read_json_file(String file) {
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject data = (JSONObject) parser.parse(new FileReader(file));
+            return data;
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+		return null;
+    }
+    
+    public boolean checkIntersent() {
+    	try {
+    		final URL url = new URL("http://www.google.com");
+    		final URLConnection conn = url.openConnection();
+    		conn.connect();
+    		conn.getInputStream().close();
+    		return true;
+		 } catch (MalformedURLException e) {
+			 throw new RuntimeException(e);
+		 } catch (IOException e) {
+			 return false;
+		 }
+    }
+    
+    @SuppressWarnings("unchecked")
+	public JSONObject data_types_on_success() {
+		JSONObject DataTypesOnSuccess = new JSONObject();
+		DataTypesOnSuccess.put("name", "String");
+		DataTypesOnSuccess.put("salary", "String");
+		DataTypesOnSuccess.put("age", "String");
+		DataTypesOnSuccess.put("id", "String");
+		return DataTypesOnSuccess;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public JSONObject data_types_on_success_for_get_employee() {
+    	JSONObject DataTypesOnSuccess = new JSONObject();
+		DataTypesOnSuccess.put("employee_name", "String");
+		DataTypesOnSuccess.put("employee_salary", "String");
+		DataTypesOnSuccess.put("employee_age", "String");
+		DataTypesOnSuccess.put("id", "String");
+		DataTypesOnSuccess.put("profile_image", "String");
+		return DataTypesOnSuccess;	
+		
     }
     
     

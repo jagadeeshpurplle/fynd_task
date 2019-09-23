@@ -12,11 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
@@ -61,9 +67,17 @@ public class Fynd_Employees_APIs {
 	String emp_name;
 	JsonArray five_employees_data = new JsonArray();
 	JsonArray all_employees_data;
+	JSONObject datatypesOfCreateAndUpdateEmployee = new JSONObject();
+	HashMap<String, String> datatypesOfUpdateEmployee = new HashMap<String, String>();
 	
+	@SuppressWarnings("unchecked")
 	@BeforeTest
 	public void setUp() throws ClassNotFoundException, IOException {
+		
+		if(!util.checkIntersent()) {
+			System.out.println("No internet connection, Please check and try again");
+			System.exit(0);
+		}
 	
 		Path path = Paths.get("./test_reports/task_automation_jagadeesh");
 		Files.createDirectories(path);
@@ -83,6 +97,15 @@ public class Fynd_Employees_APIs {
 		
 		reporter.config().setReportName("task@fynd : "+this.getClass().getSimpleName());
 		
+		
+		// If we have defined datatypes in db table, then we can make dynamic, As per this is task i'm defining like this
+		datatypesOfCreateAndUpdateEmployee.put("name", "String");
+		datatypesOfCreateAndUpdateEmployee.put("salary", "Integer");
+		datatypesOfCreateAndUpdateEmployee.put("age", "Integer");
+		datatypesOfCreateAndUpdateEmployee.put("id", "String");
+		
+		
+	
 	}
 	
 	@AfterTest
@@ -100,7 +123,7 @@ public class Fynd_Employees_APIs {
 	    	childTest.log(Status.FAIL, result.getThrowable());
 	    }else if(result.getStatus() == ITestResult.SUCCESS) {
 	    	System.out.println("success");
-	    	childTest.log(Status.PASS, "passed");	
+	    	childTest.log(Status.PASS, "Done");	
 	    }else if(result.getStatus() == ITestResult.SKIP) {
 	    	childTest.log(Status.SKIP, result.getThrowable());
 	    }
@@ -144,32 +167,52 @@ public class Fynd_Employees_APIs {
 			message = message+e_object.toString()+"<br>";
 		}
 		childTest.log(Status.PASS, message);
-
+		  util.print_star();
 	}
 
 	
 	@SuppressWarnings("unchecked")
-	@Test(priority=2, enabled = false)
-	public void create_employee() throws IOException {
-		String excelPathOfCreateEmp = System.getProperty("user.dir")+"/input_data/payload/create_employee/create_emp.xlsx";
+	@Test(priority=3)
+	public void create_employee() throws Exception {
+
+		
 		ExtentTest logger=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/create");
 		given = given();
-		file = new FileInputStream(excelPathOfCreateEmp);
+        File folder = new File(System.getProperty("user.dir")+"/input_data/payload/create_employee");
+ 
+        JsonObject res_json;
+		String file_path = "./input_data/payload/create_employee";
+		String valid_file_name = "create_emloyee_with_valid_data.json";
+		String create_emplValid =file_path+"/create_emloyee_with_valid_data.json";
+
+        
+		util.create_payload_for_update(util.getRandomName(), 950000, 22, 213, create_emplValid);
+
+		Object[][] test_data = {
+				{"create_emloyee_with_valid_data",valid_file_name,"positive"},
+		};
+		
+		util.writeToExcel("create_emp", test_data,file_path+"/create_emp.xlsx");
+		
+		file = new FileInputStream(file_path+"/create_emp.xlsx");
 		workbook = new XSSFWorkbook(file);
 		List<Object> excelData = util.getExcelData(workbook, 0);
 
 		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
+		System.out.println("test cases : "+testCases.size());
 		
-        File folder = new File(System.getProperty("user.dir")+"/input_data/payload/create_employee");
- 
-        JsonObject res_json;
-        
+		
         for(int test=0;test<testCases.size();test++) {
         	List<Object> test_case = testCases.get(test);
+        	System.out.println("Test : "+test_case.toString()+"\n"+util.getPayloadFromFile(folder+"/"+test_case.get(1)));
+        	JSONObject data = util.read_json_file(folder+"/"+test_case.get(1));
+        	
+        	
         	String exp_beh = test_case.get(2).toString();
         	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
+        	datTypeCheck(data, datatypesOfCreateAndUpdateEmployee);
 //        	System.out.println(folder+"/"+test_case.get(1));
-        	 
+        	childTest.log(Status.INFO, "creating employe with<br>"+util.getPayloadFromFile(folder+"/"+test_case.get(1)));
         	Response res= given.
 						when().
 						body(new File(folder+"/"+test_case.get(1))).
@@ -194,6 +237,8 @@ public class Fynd_Employees_APIs {
 					emp_id = res_json.get("id").toString();
 					emp_name = res_json.get("name").getAsString();
 					childTest.log(Status.PASS, "Successfully created employee with<br>"+util.prettyJson(res));
+					JSONObject object = (JSONObject) new JSONParser().parse(res_json.toString());
+					datTypeCheck(object, util.data_types_on_success());
 				}
 				
 				break;
@@ -207,8 +252,8 @@ public class Fynd_Employees_APIs {
 					childTest.log(Status.PASS, res.asString());
 				}else {
 					try {
-						res_json = (JsonObject) new JsonParser().parse(res.asString());
-						childTest.log(Status.FAIL, res.asString()+" Error is expected when we pass negative test case");
+						res_json = (JsonObject) new JsonParser().parse(res.asString());						
+						childTest.log(Status.FAIL, res.asString()+"<br> Error is expected when we pass negative test case");
 					} catch (Exception e) {
 						childTest.log(Status.FAIL, res.asString());
 					}
@@ -227,70 +272,101 @@ public class Fynd_Employees_APIs {
 			util.print_line();
 	        	
         }
-		
+        util.print_star();
+		 
 	}
 	
-	@Test(priority=3, enabled = false)
-	public void get_employee() {
-		logger = extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/employee/");
-		get_emp_details_test(emp_id, "with valid employee id", "positive");
-		get_emp_details_test(String.valueOf(123123), "with invalid employee id", "negative");
-		get_emp_details_test("&*(#*", "with unknow character employee id", "negative");
+	@SuppressWarnings("unchecked")
+	@Test(priority=2)
+	public void get_employee() throws InvalidFormatException, IOException, ParseException {
 		
+		Random rand = new Random();
+		int rand_no = rand.nextInt(all_employees_data.size());
+		JsonObject random_employee = all_employees_data.get(rand_no).getAsJsonObject();
+		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
 		
-	}	
-	
-	public void get_emp_details_test(String emp_id, String test_name, String exp_beh) {
-	
-		String resource = null;
-		if(emp_id.isEmpty()) {
-			System.out.println("emp id is null");
-			resource = "/api/v1/employee/"+emp_id.replaceAll("\"", "");
-			childTest = logger.createNode(prop.getProperty("BASE_URL")+resource);
-			childTest.log(Status.FAIL, "employee id can't be null");
-			return;
-		}else {
-			resource = "/api/v1/employee/"+emp_id.replaceAll("\"", "");
-			System.out.println(resource);
-			childTest = logger.createNode(prop.getProperty("BASE_URL")+resource);
-		}
+		System.out.println(random_employee.toString());
+		String getAPI = prop.getProperty("BASE_URL")+"/api/v1/employee/";
+		logger = extent.createTest(getAPI);
+		String file_path = "./input_data/payload/get_employee";
+		int randomNo = util.randomNumber();
 		
-		given = given();
+		Object[][] test_data = {
+				{"get_employee_valid_id",id,"positive"},
+				{"get_employee_invalid_id",randomNo,"negative"},
+		};
 		
-		Response res = given.
-							when().
-							get(resource).
-							then().assertThat().statusCode(200).extract().response();
+		util.writeToExcel("get_employee", test_data,file_path+"/get_employee.xlsx");
 		
-		System.out.println(res.asString());
-		childTest.log(Status.INFO, res.asString());
+		file = new FileInputStream(file_path+"/get_employee.xlsx");
+		workbook = new XSSFWorkbook(file);
+		List<Object> excelData = util.getExcelData(workbook, 0);
+
+		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
 		
-		switch (exp_beh) {
-		case "positive":
-			
-			JsonObject json_res = (JsonObject) new JsonParser().parse(res.asString());
-			String id = json_res.get("id").toString();
-			Assert.assertEquals(id, emp_id);
-			childTest.log(Status.PASS, res.asString());
-			
-			break;
-		case "negative":
-			if(res.asString().contains("error") || res.asString().equals("false")) {
-				childTest.log(Status.PASS, res.asString());
+		System.out.println("total no of Test cases : "+testCases.size());
+		
+        JsonObject res_json;
+        
+        for(int test=0;test<testCases.size();test++) {
+        	List<Object> test_case = testCases.get(test);
+        	String exp_beh = test_case.get(2).toString();
+        	Object emp_id = test_case.get(1);
+        	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
+//        	System.out.println(folder+"/"+test_case.get(1));
+        	
+        	childTest.log(Status.INFO, "getting details of `"+emp_id+"` employee");
+        	Response res = given.
+					when().
+					get(getAPI+emp_id).
+					then().extract().response();
+
+        	System.out.println(res.asString());
+        	childTest.log(Status.INFO, "Response : "+res.asString());	
+        	
+
+			try {
+				Assert.assertEquals(res.statusCode(), 200,", Status code error in "+test_case);
+				
+			} catch (AssertionError e) {
+				System.out.println(e.getMessage());
+				childTest.log(Status.FAIL, e.getMessage());
+				return;
 			}
-			
-			
-			break;
-		default:
-			break;
-		}
+        	
+			switch (exp_beh) {
+			case "positive":
+				
+				JsonObject json_res = (JsonObject) new JsonParser().parse(res.asString());
+				String res_id = json_res.get("id").toString();
+				JSONObject object = (JSONObject) new JSONParser().parse(json_res.toString());
+				datTypeCheck(object, util.data_types_on_success_for_get_employee());
+				Assert.assertEquals(res_id.replaceAll("\"", ""), emp_id);
+				childTest.log(Status.PASS, res.asString());
+				
+				
+				break;
+			case "negative":
+				if(res.asString().contains("error") || res.asString().equals("false")) {
+					childTest.log(Status.PASS, res.asString());
+				}
+				break;
+			default:
+				break;
+			}
+        	
 		
-	}
+			util.print_line();
+	        	
+        }
+        util.print_star();
+        extent.flush();
+	}	
 	
 	
 	
 	@Test(priority=4)
-	public void update_employee() throws IOException {
+	public void update_employee() throws IOException, InvalidFormatException, ParseException {
 		given = given();
 		Random rand = new Random();
 		int rand_no = rand.nextInt(all_employees_data.size());
@@ -301,45 +377,181 @@ public class Fynd_Employees_APIs {
 		System.out.println(random_employee.toString());
 		String updateAPI = prop.getProperty("BASE_URL")+"/api/v1/update/";
 		logger = extent.createTest(updateAPI);
-		childTest = logger.createNode(updateAPI+random_employee);
+		childTest = logger.createNode(updateAPI+id);
 		childTest.log(Status.INFO, "Taken below employee to check update API<br>"+random_employee.toString());
 		String file_path = "./input_data/payload/update_employee";
+		String update_emplValid =file_path+"/update_employee_valid_data.json";
+		String update_empl_irsp_dt=file_path+"/update_employee_irrespective_datatypes.json";
+		String update_emp_unknwn =file_path+"/update_employee_unknown_chars.json";
+		String update_emp_empty =file_path+"/update_employee_empty_data.json";
+		util.create_payload_for_update(random_employee_name.replaceAll("\"", "")+"salt", 950000, 22, 213, update_emplValid);
+		util.create_payload_for_update(util.randomNumber()+13, 950000, 22, 213, update_empl_irsp_dt);
+		util.create_payload_for_update("&*&*^(*("+"salt", 950000, 22, 213, update_emp_unknwn);
+		util.create_payload_for_update("  ", 950000, 22, 213, update_emp_empty);
+
+		Object[][] test_data = {
+				{"update_employee_valid_data",update_emplValid,"positive"},
+		};
 		
-		FileWriter f_valid = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_valid_data.json");
-		FileWriter f_empty = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_empty_data.json");
-		FileWriter f_unknown_char = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_unknown_chars.json");
-		FileWriter f_irsp_dataType = util.create_payload_for_update("chinna", 950000, 22, 213, file_path+"/update_employee_irrespective_datatypes.json");
+		util.writeToExcel("update_employee", test_data,file_path+"/update_emp.xlsx");
 		
 		
+		file = new FileInputStream(file_path+"/update_emp.xlsx");
+		workbook = new XSSFWorkbook(file);
+		List<Object> excelData = util.getExcelData(workbook, 0);
+
+		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
 		
-		List<File> files = new ArrayList<File>();
-		files.add(new File(file_path+"/update_employee_valid_data.json"));
-		files.add(new File(file_path+"/update_employee_empty_data.json"));
-		files.add(new File(file_path+"/update_employee_unknown_chars.json"));
-		files.add(new File(file_path+"/update_employee_irrespective_datatypes.json"));
+		System.out.println("test cases :"+testCases.size()); 
 		
+        JsonObject res_json;
+        
+        for(int test=0;test<testCases.size();test++) {
+        	List<Object> test_case = testCases.get(test);
+        	String exp_beh = test_case.get(2).toString();
+        	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
+//        	System.out.println(folder+"/"+test_case.get(1));
+        	 
+        	
+        	Response res = given.
+					body(new File(file_path+"/"+test_case.get(1))).
+					when().
+					put("/api/v1/update/"+id).
+					then().assertThat().statusCode(200).extract().response();
+
+        	System.out.println(res.asString());
+        	childTest.log(Status.INFO, "Response : "+res.asString());	
+
+			try {
+				Assert.assertEquals(res.statusCode(), 200,", Status code error in "+test_case);
+				
+			} catch (AssertionError e) {
+				System.out.println(e.getMessage());
+				childTest.log(Status.FAIL, e.getMessage());
+			}
+        	
+        	switch (exp_beh) {
+        	
+			case "positive":
+				if(res.asString().contains("error")) {
+					childTest.log(Status.FAIL, res.asString());
+				}else {
+					res_json = (JsonObject) new JsonParser().parse(res.asString());
+					emp_name = res_json.get("name").getAsString();
+					JSONObject object = (JSONObject) new JSONParser().parse(res_json.toString());
+					datTypeCheck(object, util.data_types_on_success());
+
+					Assert.assertNotEquals(emp_name, random_employee_name);
+					
+					childTest.log(Status.PASS, "Successfully updated employee with<br>"+util.prettyJson(res));
+					
+				}
+				
+				break;
 		
-		Response res = given.
-							body(new File("./input_data/payload/update_employee/update_employee_valid_data.json")).
-							when().
-							put("/api/v1/update/"+id).
-							then().assertThat().statusCode(200).extract().response();
+			case "negative":
+//				
+				if(res.asString().contains("error")) {
+					
+					childTest.log(Status.PASS, res.asString());
+				}else {
+					try {
+						res_json = (JsonObject) new JsonParser().parse(res.asString());
+						JSONObject object = (JSONObject) new JSONParser().parse(res_json.toString());
+						datTypeCheck(object, util.data_types_on_success());
+						emp_name = res_json.get("name").getAsString();
+						try {
+							Assert.assertEquals(emp_name, random_employee_name);
+							childTest.log(Status.PASS, "No updated as we passed negative scenario<br>"+util.getPayloadFromFile(file_path+"/"+test_case.get(1)));
+						} catch (AssertionError e) {
+							childTest.log(Status.FAIL, "should not get updated when we pass negative scenario as<br>"+util.getPayloadFromFile(file_path+"/"+test_case.get(1)));
+						}
+
+					} catch (Exception e) {
+						childTest.log(Status.FAIL, res.asString());
+					}
+				}
+				
+				break;
+				
+			default:
+				break;
+			}
+        	
 		
-		System.out.println(res.asString());
+			util.print_line();
+	        	
+        }
+
+		
+        util.print_star();
+		
 		
 	}
 	
-	public void update_employee_details(String name, String exp_beh) {
-		
-		
-		
-	}
 	
-	
+	@Test(priority=5)
 	public void delete_employee() {
 	
+		given = given();
+		Random rand = new Random();
+		int rand_no = rand.nextInt(all_employees_data.size());
+		JsonObject random_employee = all_employees_data.get(rand_no).getAsJsonObject();
+		String random_employee_name = random_employee.get("employee_name").toString();
+		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
+		
+		System.out.println(random_employee.toString());
+		String deleteAPI = prop.getProperty("BASE_URL")+"/api/v1/delete/";
+		logger = extent.createTest(deleteAPI+id);
+		logger.log(Status.INFO, "Taken below employee to DELETE<br>"+random_employee.toString());
+		
+		Response res = given.
+							when().	
+							delete(deleteAPI+id).
+							then().assertThat().extract().response();
+		
+		System.out.println(res.asString());
+		try {
+			Assert.assertEquals(res.statusCode(), 200);
+			JsonObject res_json = (JsonObject) new JsonParser().parse(res.asString());
+			JsonObject success =  res_json.get("success").getAsJsonObject();
+			String text = success.get("text").toString();
+			Assert.assertEquals(text, "\"successfully! deleted Records\"");
+			logger.log(Status.PASS, text);
+			
+		} catch (AssertionError e) {
+			logger.log(Status.FAIL, "status code error: "+res.statusCode()+"<br>"+e.getMessage());
+			System.out.println(e.getMessage());
+		}
+		
+		
 	
 	
+	}
+	
+	
+	private void datTypeCheck(JSONObject actualValues, JSONObject datatypesOfCreateAndUpdateEmployee) {
+
+		for(Object key : actualValues.keySet()) {
+			Object value = actualValues.get(key);
+			System.out.println(value+", "+datatypesOfCreateAndUpdateEmployee.get(key));
+			System.out.println(value.getClass().getSimpleName() +", "+datatypesOfCreateAndUpdateEmployee.get(key));
+			try {
+				Object dt = value.getClass().getSimpleName();
+				if(dt.equals("Long")) {
+					Assert.assertEquals(value.getClass().getSimpleName(), "Long");
+				}else {
+					Assert.assertEquals(value.getClass().getSimpleName(), datatypesOfCreateAndUpdateEmployee.get(key));	
+				}
+				System.out.println("Datatype validation success");	
+				childTest.log(Status.PASS, "data type validation for "+value+" is success");
+			} catch (AssertionError e) {
+				System.out.println(e.getMessage());
+				childTest.log(Status.WARNING, e.getMessage()+"<br>"+key+" datatype must be "+datatypesOfCreateAndUpdateEmployee.get(key)+"<br>But detected datatype is : "+value.getClass().getSimpleName());
+			}
+			
+		}
+		
 	}
 	
 }

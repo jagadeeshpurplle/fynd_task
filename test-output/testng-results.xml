@@ -1,47 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results skipped="0" failed="0" ignored="2" total="4" passed="2">
+<testng-results skipped="0" failed="0" ignored="1" total="5" passed="4">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="4765" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:37Z">
+  <suite name="Default suite" duration-ms="16490" started-at="2019-09-23T17:14:08Z" finished-at="2019-09-23T17:14:24Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="4765" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:37Z">
+    <test name="Default test" duration-ms="16490" started-at="2019-09-23T17:14:08Z" finished-at="2019-09-23T17:14:24Z">
       <class name="tests.Fynd_Employees_APIs">
-        <test-method status="PASS" signature="setUp()[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="setUp" is-config="true" duration-ms="519" started-at="2019-09-22T15:06:32Z" finished-at="2019-09-22T15:06:33Z">
+        <test-method status="PASS" signature="setUp()[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="setUp" is-config="true" duration-ms="701" started-at="2019-09-23T17:14:08Z" finished-at="2019-09-23T17:14:09Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method status="PASS" signature="get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@31610302]" name="get_all_employees" duration-ms="2312" started-at="2019-09-22T15:06:33Z" finished-at="2019-09-22T15:06:35Z">
+        <test-method status="PASS" signature="get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@2286778]" name="get_all_employees" duration-ms="2283" started-at="2019-09-23T17:14:09Z" finished-at="2019-09-23T17:14:11Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- get_all_employees -->
-        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="getResult" is-config="true" duration-ms="389" started-at="2019-09-22T15:06:35Z" finished-at="2019-09-22T15:06:35Z">
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="getResult" is-config="true" duration-ms="388" started-at="2019-09-23T17:14:11Z" finished-at="2019-09-23T17:14:11Z">
           <params>
             <param index="0">
               <value>
-                <![CDATA[[TestResult name=get_all_employees status=SUCCESS method=Fynd_Employees_APIs.get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@31610302] output={null}]]]>
+                <![CDATA[[TestResult name=get_all_employees status=SUCCESS method=Fynd_Employees_APIs.get_all_employees()[pri:1, instance:tests.Fynd_Employees_APIs@2286778] output={null}]]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- getResult -->
-        <test-method status="PASS" signature="update_employee()[pri:4, instance:tests.Fynd_Employees_APIs@31610302]" name="update_employee" duration-ms="1461" started-at="2019-09-22T15:06:35Z" finished-at="2019-09-22T15:06:37Z">
+        <test-method status="PASS" signature="get_employee()[pri:2, instance:tests.Fynd_Employees_APIs@2286778]" name="get_employee" duration-ms="6250" started-at="2019-09-23T17:14:11Z" finished-at="2019-09-23T17:14:18Z">
           <reporter-output>
           </reporter-output>
-        </test-method> <!-- update_employee -->
-        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="getResult" is-config="true" duration-ms="67" started-at="2019-09-22T15:06:37Z" finished-at="2019-09-22T15:06:37Z">
+        </test-method> <!-- get_employee -->
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="getResult" is-config="true" duration-ms="57" started-at="2019-09-23T17:14:18Z" finished-at="2019-09-23T17:14:18Z">
           <params>
             <param index="0">
               <value>
-                <![CDATA[[TestResult name=update_employee status=SUCCESS method=Fynd_Employees_APIs.update_employee()[pri:4, instance:tests.Fynd_Employees_APIs@31610302] output={null}]]]>
+                <![CDATA[[TestResult name=get_employee status=SUCCESS method=Fynd_Employees_APIs.get_employee()[pri:2, instance:tests.Fynd_Employees_APIs@2286778] output={null}]]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- getResult -->
-        <test-method status="PASS" signature="tearDown()[pri:0, instance:tests.Fynd_Employees_APIs@31610302]" name="tearDown" is-config="true" duration-ms="0" started-at="2019-09-22T15:06:37Z" finished-at="2019-09-22T15:06:37Z">
+        <test-method status="PASS" signature="create_employee()[pri:3, instance:tests.Fynd_Employees_APIs@2286778]" name="create_employee" duration-ms="5208" started-at="2019-09-23T17:14:18Z" finished-at="2019-09-23T17:14:23Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- create_employee -->
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="getResult" is-config="true" duration-ms="70" started-at="2019-09-23T17:14:23Z" finished-at="2019-09-23T17:14:23Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=create_employee status=SUCCESS method=Fynd_Employees_APIs.create_employee()[pri:3, instance:tests.Fynd_Employees_APIs@2286778] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- getResult -->
+        <test-method status="PASS" signature="delete_employee()[pri:5, instance:tests.Fynd_Employees_APIs@2286778]" name="delete_employee" duration-ms="1461" started-at="2019-09-23T17:14:23Z" finished-at="2019-09-23T17:14:24Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- delete_employee -->
+        <test-method status="PASS" signature="getResult(org.testng.ITestResult)[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="getResult" is-config="true" duration-ms="48" started-at="2019-09-23T17:14:24Z" finished-at="2019-09-23T17:14:24Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=delete_employee status=SUCCESS method=Fynd_Employees_APIs.delete_employee()[pri:5, instance:tests.Fynd_Employees_APIs@2286778] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- getResult -->
+        <test-method status="PASS" signature="tearDown()[pri:0, instance:tests.Fynd_Employees_APIs@2286778]" name="tearDown" is-config="true" duration-ms="1" started-at="2019-09-23T17:14:24Z" finished-at="2019-09-23T17:14:24Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->

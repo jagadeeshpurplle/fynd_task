@@ -91,7 +91,7 @@
               <div class="suite-section-content">
                 <ul>
                   <li>
-                    <span class="method-stats">2 methods,   2 passed</span>
+                    <span class="method-stats">4 methods,   4 passed</span>
                   </li>
                   <li>
                     <span class="method-list-title passed">Passed methods</span>
@@ -102,12 +102,22 @@
                     <div class="method-list-content passed suite-Default_suite">
                       <span>
                         <img width="3%" src="passed.png"/>
+                        <a href="#" class="method navigator-link" panel-name="suite-Default_suite" title="tests.Fynd_Employees_APIs" hash-for-method="create_employee">create_employee</a> <!-- method navigator-link -->
+                      </span>
+                      <br/>
+                      <span>
+                        <img width="3%" src="passed.png"/>
+                        <a href="#" class="method navigator-link" panel-name="suite-Default_suite" title="tests.Fynd_Employees_APIs" hash-for-method="delete_employee">delete_employee</a> <!-- method navigator-link -->
+                      </span>
+                      <br/>
+                      <span>
+                        <img width="3%" src="passed.png"/>
                         <a href="#" class="method navigator-link" panel-name="suite-Default_suite" title="tests.Fynd_Employees_APIs" hash-for-method="get_all_employees">get_all_employees</a> <!-- method navigator-link -->
                       </span>
                       <br/>
                       <span>
                         <img width="3%" src="passed.png"/>
-                        <a href="#" class="method navigator-link" panel-name="suite-Default_suite" title="tests.Fynd_Employees_APIs" hash-for-method="update_employee">update_employee</a> <!-- method navigator-link -->
+                        <a href="#" class="method navigator-link" panel-name="suite-Default_suite" title="tests.Fynd_Employees_APIs" hash-for-method="get_employee">get_employee</a> <!-- method navigator-link -->
                       </span>
                       <br/>
                     </div> <!-- method-list-content passed suite-Default_suite -->
@@ -130,6 +140,20 @@
             <div class="main-panel-content rounded-window-bottom">
               <div class="method">
                 <div class="method-content">
+                  <a name="create_employee">
+                  </a> <!-- create_employee -->
+                  <span class="method-name">create_employee</span>
+                </div> <!-- method-content -->
+              </div> <!-- method -->
+              <div class="method">
+                <div class="method-content">
+                  <a name="delete_employee">
+                  </a> <!-- delete_employee -->
+                  <span class="method-name">delete_employee</span>
+                </div> <!-- method-content -->
+              </div> <!-- method -->
+              <div class="method">
+                <div class="method-content">
                   <a name="get_all_employees">
                   </a> <!-- get_all_employees -->
                   <span class="method-name">get_all_employees</span>
@@ -137,9 +161,9 @@
               </div> <!-- method -->
               <div class="method">
                 <div class="method-content">
-                  <a name="update_employee">
-                  </a> <!-- update_employee -->
-                  <span class="method-name">update_employee</span>
+                  <a name="get_employee">
+                  </a> <!-- get_employee -->
+                  <span class="method-name">get_employee</span>
                 </div> <!-- method-content -->
               </div> <!-- method -->
             </div> <!-- main-panel-content rounded-window-bottom -->
@@ -147,7 +171,7 @@
         </div> <!-- panel Default_suite -->
         <div panel-name="test-xml-Default_suite" class="panel">
           <div class="main-panel-header rounded-window-top">
-            <span class="header-content">/tmp/testng-eclipse-2049093492/testng-customsuite.xml</span>
+            <span class="header-content">/tmp/testng-eclipse-1354448465/testng-customsuite.xml</span>
           </div> <!-- main-panel-header rounded-window-top -->
           <div class="main-panel-content rounded-window-bottom">
             <pre>
@@ -196,20 +220,28 @@ data.addColumn('number', 'Number');
 data.addColumn('string', 'Method');
 data.addColumn('string', 'Class');
 data.addColumn('number', 'Time (ms)');
-data.addRows(2);
+data.addRows(4);
 data.setCell(0, 0, 0)
-data.setCell(0, 1, 'get_all_employees')
+data.setCell(0, 1, 'get_employee')
 data.setCell(0, 2, 'tests.Fynd_Employees_APIs')
-data.setCell(0, 3, 2312);
+data.setCell(0, 3, 6250);
 data.setCell(1, 0, 1)
-data.setCell(1, 1, 'update_employee')
+data.setCell(1, 1, 'create_employee')
 data.setCell(1, 2, 'tests.Fynd_Employees_APIs')
-data.setCell(1, 3, 1461);
+data.setCell(1, 3, 5208);
+data.setCell(2, 0, 2)
+data.setCell(2, 1, 'get_all_employees')
+data.setCell(2, 2, 'tests.Fynd_Employees_APIs')
+data.setCell(2, 3, 2283);
+data.setCell(3, 0, 3)
+data.setCell(3, 1, 'delete_employee')
+data.setCell(3, 2, 'tests.Fynd_Employees_APIs')
+data.setCell(3, 3, 1461);
 window.suiteTableData['Default_suite']= { tableData: data, tableDiv: 'times-div-Default_suite'}
 return data;
 }
               </script>
-              <span class="suite-total-time">Total running time: 3 seconds</span>
+              <span class="suite-total-time">Total running time: 15 seconds</span>
               <div id="times-div-Default_suite">
               </div> <!-- times-div-Default_suite -->
             </div> <!-- times-div -->
@@ -224,15 +256,13 @@ return data;
         </div> <!-- panel -->
         <div panel-name="ignored-methods-Default_suite" class="panel">
           <div class="main-panel-header rounded-window-top">
-            <span class="header-content">2 ignored methods</span>
+            <span class="header-content">1 ignored method</span>
           </div> <!-- main-panel-header rounded-window-top -->
           <div class="main-panel-content rounded-window-bottom">
             <div class="ignored-class-div">
               <span class="ignored-class-name">tests.Fynd_Employees_APIs</span>
               <div class="ignored-methods-div">
-                <span class="ignored-method-name">create_employee</span>
-                <br/>
-                <span class="ignored-method-name">get_employee</span>
+                <span class="ignored-method-name">update_employee</span>
                 <br/>
               </div> <!-- ignored-methods-div -->
             </div> <!-- ignored-class-div -->
@@ -251,23 +281,39 @@ return data;
               </div> <!-- configuration-test before -->
               <div class="test-method">
                 <span class="method-name">get_all_employees</span>
-                <span class="method-start">527 ms</span>
+                <span class="method-start">711 ms</span>
               </div> <!-- test-method -->
               <div class="configuration-method after">
                 <span class="method-name">getResult([TestResult name=get_all_employees status=SUCCESS method=Fynd_Employees_APIs.get_all_employees()[pri...)</span>
-                <span class="method-start">2841 ms</span>
+                <span class="method-start">2996 ms</span>
               </div> <!-- configuration-method after -->
               <div class="test-method">
-                <span class="method-name">update_employee</span>
-                <span class="method-start">3231 ms</span>
+                <span class="method-name">get_employee</span>
+                <span class="method-start">3385 ms</span>
               </div> <!-- test-method -->
               <div class="configuration-method after">
-                <span class="method-name">getResult([TestResult name=update_employee status=SUCCESS method=Fynd_Employees_APIs.update_employee()[pri:4, ...)</span>
-                <span class="method-start">4693 ms</span>
+                <span class="method-name">getResult([TestResult name=get_employee status=SUCCESS method=Fynd_Employees_APIs.get_employee()[pri:2, instan...)</span>
+                <span class="method-start">9637 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="test-method">
+                <span class="method-name">create_employee</span>
+                <span class="method-start">9695 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">getResult([TestResult name=create_employee status=SUCCESS method=Fynd_Employees_APIs.create_employee()[pri:3, ...)</span>
+                <span class="method-start">14904 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="test-method">
+                <span class="method-name">delete_employee</span>
+                <span class="method-start">14974 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">getResult([TestResult name=delete_employee status=SUCCESS method=Fynd_Employees_APIs.delete_employee()[pri:5, ...)</span>
+                <span class="method-start">16437 ms</span>
               </div> <!-- configuration-method after -->
               <div class="configuration-test after">
                 <span class="method-name">tearDown</span>
-                <span class="method-start">4761 ms</span>
+                <span class="method-start">16485 ms</span>
               </div> <!-- configuration-test after -->
           </div> <!-- main-panel-content rounded-window-bottom -->
         </div> <!-- panel -->
