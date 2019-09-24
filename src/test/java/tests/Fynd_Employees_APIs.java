@@ -146,7 +146,7 @@ public class Fynd_Employees_APIs {
 						get(prop.getProperty("get_all_emp_resource")).
 						then().assertThat().statusCode(200).extract().response();
 		all_employees_data = (JsonArray) new JsonParser().parse(res.asString());
-
+		
 //		System.out.println(res.asString());
 		System.out.println(all_employees_data.size());
 		if(all_employees_data.size()==0) {
