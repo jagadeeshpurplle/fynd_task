@@ -147,7 +147,7 @@ public class Fynd_Employees_APIs {
 						then().assertThat().statusCode(200).extract().response();
 		all_employees_data = (JsonArray) new JsonParser().parse(res.asString());
 
-		System.out.println(res.asString());
+//		System.out.println(res.asString());
 		System.out.println(all_employees_data.size());
 		if(all_employees_data.size()==0) {
 			childTest.log(Status.INFO, "No employee data");
