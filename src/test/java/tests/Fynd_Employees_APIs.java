@@ -1,5 +1,9 @@
 package tests;
 
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.AssertJUnit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -94,9 +98,8 @@ public class Fynd_Employees_APIs {
 		
 		
 		RestAssured.baseURI = prop.getProperty("BASE_URL");
-		
 		reporter.config().setReportName("task@fynd : "+this.getClass().getSimpleName());
-		
+//		
 		
 		// If we have defined datatypes in db table, then we can make dynamic, As per this is task i'm defining like this
 		datatypesOfCreateAndUpdateEmployee.put("name", "String");
@@ -108,6 +111,7 @@ public class Fynd_Employees_APIs {
 	
 	}
 	
+	@AfterMethod
 	@AfterTest
 	public void tearDown() throws SQLException {
 		
@@ -135,11 +139,11 @@ public class Fynd_Employees_APIs {
 	@Test(priority=1)
 	public void get_all_employees() {
 		
-		childTest=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/employees");
+		childTest=extent.createTest(prop.getProperty("BASE_URL")+prop.getProperty("get_all_emp_resource"));
 		given = given();
 		Response res= given.
 						when().
-						get("/api/v1/employees").
+						get(prop.getProperty("get_all_emp_resource")).
 						then().assertThat().statusCode(200).extract().response();
 		all_employees_data = (JsonArray) new JsonParser().parse(res.asString());
 
@@ -167,19 +171,18 @@ public class Fynd_Employees_APIs {
 			message = message+e_object.toString()+"<br>";
 		}
 		childTest.log(Status.PASS, message);
-		  util.print_star();
+		util.print_star();
 	}
 
 	
 	@SuppressWarnings("unchecked")
 	@Test(priority=3)
 	public void create_employee() throws Exception {
-
-		
-		ExtentTest logger=extent.createTest(prop.getProperty("BASE_URL")+"/api/v1/create");
+		ExtentTest logger=extent.createTest(prop.getProperty("BASE_URL")+prop.getProperty("create_emp_resource"));
 		given = given();
         File folder = new File(System.getProperty("user.dir")+"/input_data/payload/create_employee");
- 
+
+        
         JsonObject res_json;
 		String file_path = "./input_data/payload/create_employee";
 		String valid_file_name = "create_emloyee_with_valid_data.json";
@@ -188,16 +191,16 @@ public class Fynd_Employees_APIs {
         
 		util.create_payload_for_update(util.getRandomName(), 950000, 22, 213, create_emplValid);
 
+		
 		Object[][] test_data = {
 				{"create_emloyee_with_valid_data",valid_file_name,"positive"},
 		};
-		
 		util.writeToExcel("create_emp", test_data,file_path+"/create_emp.xlsx");
+		
 		
 		file = new FileInputStream(file_path+"/create_emp.xlsx");
 		workbook = new XSSFWorkbook(file);
 		List<Object> excelData = util.getExcelData(workbook, 0);
-
 		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
 		System.out.println("test cases : "+testCases.size());
 		
@@ -206,29 +209,30 @@ public class Fynd_Employees_APIs {
         	List<Object> test_case = testCases.get(test);
         	System.out.println("Test : "+test_case.toString()+"\n"+util.getPayloadFromFile(folder+"/"+test_case.get(1)));
         	JSONObject data = util.read_json_file(folder+"/"+test_case.get(1));
-        	
-        	
         	String exp_beh = test_case.get(2).toString();
         	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
         	datTypeCheck(data, datatypesOfCreateAndUpdateEmployee);
 //        	System.out.println(folder+"/"+test_case.get(1));
         	childTest.log(Status.INFO, "creating employe with<br>"+util.getPayloadFromFile(folder+"/"+test_case.get(1)));
+        	
+        	
+        	
         	Response res= given.
 						when().
 						body(new File(folder+"/"+test_case.get(1))).
-						post("/api/v1/create").
+						post(prop.getProperty("create_emp_resource")).
 						then().extract().response();
+        	
         	
 			try {
 				Assert.assertEquals(res.statusCode(), 200,", Status code error in "+test_case);
-				
 			} catch (AssertionError e) {
 				System.out.println(e.getMessage());
 				childTest.log(Status.FAIL, e.getMessage());
 			}
         	
+			
         	switch (exp_beh) {
-        	
 			case "positive":
 				if(res.asString().contains("error")) {
 					childTest.log(Status.FAIL, res.asString());
@@ -240,11 +244,8 @@ public class Fynd_Employees_APIs {
 					JSONObject object = (JSONObject) new JSONParser().parse(res_json.toString());
 					datTypeCheck(object, util.data_types_on_success());
 				}
-				
 				break;
-		
 			case "negative":
-//				
 				if(res.asString().contains("error")) {
 					if(res.asString().contains(test_case.get(0).toString())) {
 						childTest.log(Status.PASS, "employee details can't be duplicate");
@@ -258,16 +259,12 @@ public class Fynd_Employees_APIs {
 						childTest.log(Status.FAIL, res.asString());
 					}
 				}
-				
 				break;
 				
 			default:
 				break;
 			}
-        	
         	childTest.log(Status.INFO, "Response : "+res.asString());	
-		
-	
         	System.out.println(res.asString());
 			util.print_line();
 	        	
@@ -284,28 +281,25 @@ public class Fynd_Employees_APIs {
 		int rand_no = rand.nextInt(all_employees_data.size());
 		JsonObject random_employee = all_employees_data.get(rand_no).getAsJsonObject();
 		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
-		
 		System.out.println(random_employee.toString());
-		String getAPI = prop.getProperty("BASE_URL")+"/api/v1/employee/";
+		String getAPI = prop.getProperty("BASE_URL")+prop.getProperty("get_emp_resource");
 		logger = extent.createTest(getAPI);
 		String file_path = "./input_data/payload/get_employee";
 		int randomNo = util.randomNumber();
+		
 		
 		Object[][] test_data = {
 				{"get_employee_valid_id",id,"positive"},
 				{"get_employee_invalid_id",randomNo,"negative"},
 		};
-		
 		util.writeToExcel("get_employee", test_data,file_path+"/get_employee.xlsx");
+		
 		
 		file = new FileInputStream(file_path+"/get_employee.xlsx");
 		workbook = new XSSFWorkbook(file);
 		List<Object> excelData = util.getExcelData(workbook, 0);
-
 		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
-		
 		System.out.println("total no of Test cases : "+testCases.size());
-		
         JsonObject res_json;
         
         for(int test=0;test<testCases.size();test++) {
@@ -313,21 +307,21 @@ public class Fynd_Employees_APIs {
         	String exp_beh = test_case.get(2).toString();
         	Object emp_id = test_case.get(1);
         	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
-//        	System.out.println(folder+"/"+test_case.get(1));
-        	
         	childTest.log(Status.INFO, "getting details of `"+emp_id+"` employee");
+        	
+        	
         	Response res = given.
 					when().
 					get(getAPI+emp_id).
 					then().extract().response();
 
+        	
         	System.out.println(res.asString());
         	childTest.log(Status.INFO, "Response : "+res.asString());	
         	
 
 			try {
 				Assert.assertEquals(res.statusCode(), 200,", Status code error in "+test_case);
-				
 			} catch (AssertionError e) {
 				System.out.println(e.getMessage());
 				childTest.log(Status.FAIL, e.getMessage());
@@ -336,15 +330,12 @@ public class Fynd_Employees_APIs {
         	
 			switch (exp_beh) {
 			case "positive":
-				
 				JsonObject json_res = (JsonObject) new JsonParser().parse(res.asString());
 				String res_id = json_res.get("id").toString();
 				JSONObject object = (JSONObject) new JSONParser().parse(json_res.toString());
 				datTypeCheck(object, util.data_types_on_success_for_get_employee());
-				Assert.assertEquals(res_id.replaceAll("\"", ""), emp_id);
+				AssertJUnit.assertEquals(res_id.replaceAll("\"", ""), emp_id);
 				childTest.log(Status.PASS, res.asString());
-				
-				
 				break;
 			case "negative":
 				if(res.asString().contains("error") || res.asString().equals("false")) {
@@ -360,7 +351,7 @@ public class Fynd_Employees_APIs {
 	        	
         }
         util.print_star();
-        extent.flush();
+//        extent.flush();
 	}	
 	
 	
@@ -373,12 +364,15 @@ public class Fynd_Employees_APIs {
 		JsonObject random_employee = all_employees_data.get(rand_no).getAsJsonObject();
 		String random_employee_name = random_employee.get("employee_name").toString();
 		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
-		
 		System.out.println(random_employee.toString());
-		String updateAPI = prop.getProperty("BASE_URL")+"/api/v1/update/";
+		
+		
+		String updateAPI = prop.getProperty("BASE_URL")+prop.getProperty("update_emp_resource");
 		logger = extent.createTest(updateAPI);
 		childTest = logger.createNode(updateAPI+id);
 		childTest.log(Status.INFO, "Taken below employee to check update API<br>"+random_employee.toString());
+		
+		
 		String file_path = "./input_data/payload/update_employee";
 		String update_emplValid =file_path+"/update_employee_valid_data.json";
 		String update_empl_irsp_dt=file_path+"/update_employee_irrespective_datatypes.json";
@@ -392,7 +386,6 @@ public class Fynd_Employees_APIs {
 		Object[][] test_data = {
 				{"update_employee_valid_data",update_emplValid,"positive"},
 		};
-		
 		util.writeToExcel("update_employee", test_data,file_path+"/update_emp.xlsx");
 		
 		
@@ -401,37 +394,34 @@ public class Fynd_Employees_APIs {
 		List<Object> excelData = util.getExcelData(workbook, 0);
 
 		ArrayList<ArrayList<Object>> testCases = (ArrayList<ArrayList<Object>>) excelData.get(1);
-		
-		System.out.println("test cases :"+testCases.size()); 
-		
+		System.out.println("test cases :"+testCases.size()); 		
         JsonObject res_json;
+        
         
         for(int test=0;test<testCases.size();test++) {
         	List<Object> test_case = testCases.get(test);
         	String exp_beh = test_case.get(2).toString();
         	childTest = logger.createNode(test_case.get(0).toString()+", "+exp_beh);
-//        	System.out.println(folder+"/"+test_case.get(1));
-        	 
-        	
+
         	Response res = given.
 					body(new File(file_path+"/"+test_case.get(1))).
 					when().
-					put("/api/v1/update/"+id).
+					put(updateAPI+id).
 					then().assertThat().statusCode(200).extract().response();
 
         	System.out.println(res.asString());
         	childTest.log(Status.INFO, "Response : "+res.asString());	
 
+        	
 			try {
 				Assert.assertEquals(res.statusCode(), 200,", Status code error in "+test_case);
-				
 			} catch (AssertionError e) {
 				System.out.println(e.getMessage());
 				childTest.log(Status.FAIL, e.getMessage());
 			}
+			
         	
         	switch (exp_beh) {
-        	
 			case "positive":
 				if(res.asString().contains("error")) {
 					childTest.log(Status.FAIL, res.asString());
@@ -440,9 +430,7 @@ public class Fynd_Employees_APIs {
 					emp_name = res_json.get("name").getAsString();
 					JSONObject object = (JSONObject) new JSONParser().parse(res_json.toString());
 					datTypeCheck(object, util.data_types_on_success());
-
 					Assert.assertNotEquals(emp_name, random_employee_name);
-					
 					childTest.log(Status.PASS, "Successfully updated employee with<br>"+util.prettyJson(res));
 					
 				}
@@ -450,9 +438,7 @@ public class Fynd_Employees_APIs {
 				break;
 		
 			case "negative":
-//				
 				if(res.asString().contains("error")) {
-					
 					childTest.log(Status.PASS, res.asString());
 				}else {
 					try {
@@ -461,29 +447,21 @@ public class Fynd_Employees_APIs {
 						datTypeCheck(object, util.data_types_on_success());
 						emp_name = res_json.get("name").getAsString();
 						try {
-							Assert.assertEquals(emp_name, random_employee_name);
+							AssertJUnit.assertEquals(emp_name, random_employee_name);
 							childTest.log(Status.PASS, "No updated as we passed negative scenario<br>"+util.getPayloadFromFile(file_path+"/"+test_case.get(1)));
 						} catch (AssertionError e) {
 							childTest.log(Status.FAIL, "should not get updated when we pass negative scenario as<br>"+util.getPayloadFromFile(file_path+"/"+test_case.get(1)));
 						}
-
 					} catch (Exception e) {
 						childTest.log(Status.FAIL, res.asString());
 					}
 				}
-				
 				break;
-				
 			default:
 				break;
 			}
-        	
-		
-			util.print_line();
-	        	
+			util.print_line();        	
         }
-
-		
         util.print_star();
 		
 		
@@ -501,7 +479,7 @@ public class Fynd_Employees_APIs {
 		int id = Integer.parseInt(random_employee.get("id").toString().replaceAll("\"", ""));
 		
 		System.out.println(random_employee.toString());
-		String deleteAPI = prop.getProperty("BASE_URL")+"/api/v1/delete/";
+		String deleteAPI = prop.getProperty("BASE_URL")+prop.getProperty("delete_emp_resource");
 		logger = extent.createTest(deleteAPI+id);
 		logger.log(Status.INFO, "Taken below employee to DELETE<br>"+random_employee.toString());
 		
@@ -512,11 +490,11 @@ public class Fynd_Employees_APIs {
 		
 		System.out.println(res.asString());
 		try {
-			Assert.assertEquals(res.statusCode(), 200);
+			AssertJUnit.assertEquals(res.statusCode(), 200);
 			JsonObject res_json = (JsonObject) new JsonParser().parse(res.asString());
 			JsonObject success =  res_json.get("success").getAsJsonObject();
 			String text = success.get("text").toString();
-			Assert.assertEquals(text, "\"successfully! deleted Records\"");
+			AssertJUnit.assertEquals(text, "\"successfully! deleted Records\"");
 			logger.log(Status.PASS, text);
 			
 		} catch (AssertionError e) {
@@ -539,9 +517,9 @@ public class Fynd_Employees_APIs {
 			try {
 				Object dt = value.getClass().getSimpleName();
 				if(dt.equals("Long")) {
-					Assert.assertEquals(value.getClass().getSimpleName(), "Long");
+					AssertJUnit.assertEquals(value.getClass().getSimpleName(), "Long");
 				}else {
-					Assert.assertEquals(value.getClass().getSimpleName(), datatypesOfCreateAndUpdateEmployee.get(key));	
+					AssertJUnit.assertEquals(value.getClass().getSimpleName(), datatypesOfCreateAndUpdateEmployee.get(key));	
 				}
 				System.out.println("Datatype validation success");	
 				childTest.log(Status.PASS, "data type validation for "+value+" is success");
